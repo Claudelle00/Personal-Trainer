@@ -10,7 +10,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import AddTraining from "../Trainings/AddTraining";
 import { Button , Box} from "@mui/material";
-
+ 
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
@@ -18,10 +18,10 @@ function CustomToolbar() {
     </GridToolbarContainer>
   );
 }
-
+ 
 function CustomerList() {
     const [customers, setCustomers]= useState<CustomerData[]>([]);
-    
+   
     const columns : GridColDef[]= [
         {field: "firstname", headerName:"First Name", width: 100 },
         {field: "lastname", headerName:"Last Name", width: 100 },
@@ -37,14 +37,14 @@ function CustomerList() {
          sortable: false,
          filterable: false,
          renderCell: (params: GridRenderCellParams<CustomerData>) =>(
-         <IconButton 
-            color="error" 
-            size="small" 
+         <IconButton
+            color="error"
+            size="small"
             onClick={() => handleDelete(params.row._links.self.href)}>
         <DeleteIcon/>
          </IconButton>
          )
-     }, 
+     },
      {
         field:"edit",
         headerName:"",
@@ -52,12 +52,12 @@ function CustomerList() {
         sortable:false,
         filterable:false,
         renderCell: (params: GridRenderCellParams<CustomerData>)=>
-            
-            <EditCustomer 
+           
+            <EditCustomer
             url={params.row._links.self.href}
-            customer={params.row} 
+            customer={params.row}
             handleUpdate={handleUpdate}/>
-            
+           
      },
      {
          field: "add training",
@@ -66,21 +66,21 @@ function CustomerList() {
          sortable: false,
          filterable: false,
          renderCell: (params: GridRenderCellParams<CustomerData>) =>(
-         <AddTraining 
-            customerUrl={params.row._links.self.href} 
+         <AddTraining
+            customerUrl={params.row._links.self.href}
             handleAddTraining={handleAddTraining}
         />
-        
+       
          )
-     }, 
+     },
     ]
-
+ 
 const exportCustomersCSV = () => {
   fetch(`${import.meta.env.VITE_API_URL}/customers`)
     .then(res => res.json())
     .then(data => {
       const customers = data._embedded.customers;
-
+ 
       // pick only needed fields
       const filtered = customers.map((c: any) => ({
         firstname: c.firstname,
@@ -89,19 +89,19 @@ const exportCustomersCSV = () => {
         phone: c.phone,
         city: c.city
       }));
-
+ 
       // convert to CSV
       const headers = Object.keys(filtered[0]).join(",");
       const rows = filtered.map((obj: any) =>
         Object.values(obj).join(",")
       );
-
+ 
       const csvContent = [headers, ...rows].join("\n");
-
+ 
       // download file
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const url = window.URL.createObjectURL(blob);
-
+ 
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", "customers.csv");
@@ -116,10 +116,10 @@ const exportCustomersCSV = () => {
         .then(data => setCustomers(data._embedded.customers))
         .catch(err => console.error(err))
     }
-
-      
-
-//DELETE 
+ 
+     
+ 
+//DELETE
     const handleDelete = (url: string)=> {
         if (window.confirm("Are you sure?")) {
          deleteCustomer(url)
@@ -127,10 +127,10 @@ const exportCustomersCSV = () => {
         .catch(err => console.error(err));
       }
     }
-
-//ADD 
+ 
+//ADD
     const handleAdd = (customer: Customer) => {
-        
+       
         fetch(import.meta.env.VITE_API_URL + "/customers", {
             method: "POST",
             headers:{
@@ -141,18 +141,18 @@ const exportCustomersCSV = () => {
         .then(response =>{
             if (!response.ok)
                 throw new Error("Error when adding customer");
-
+ 
             return response.json();
         })
         .then(()=> getCustomers())
         .catch(err => console.error(err));
     }
-
+ 
 // ADD TRAINING
-
+ 
     const handleAddTraining = (training:Trainings) => {
        
-
+ 
         fetch(import.meta.env.VITE_API_URL + "/trainings", {
             method: "POST",
             headers:{
@@ -163,15 +163,15 @@ const exportCustomersCSV = () => {
         .then(response =>{
             if (!response.ok)
                 throw new Error("Error when adding traininig");
-
+ 
             return response.json();
         })
         .catch(err => console.error(err));
     }
-
+ 
 // UPDATE
     const handleUpdate = (url: string, updatedCustomer: Customer) => {
-
+ 
         fetch(url, {
             method:"PUT",
             headers:{
@@ -182,19 +182,19 @@ const exportCustomersCSV = () => {
         .then(response =>{
             if (!response.ok)
                 throw new Error("Error when updating customer")
-
+ 
             return response.json();
         })
         .then(()=> getCustomers())
         .catch(err => console.error(err))
     }
-
+ 
     useEffect(()=>{
         getCustomers();
     }, []);
-
+ 
    
-
+ 
     return(
     <>
       <Stack direction="row" sx={{ mt: 3, mb: 3 }} >
@@ -231,15 +231,16 @@ const exportCustomersCSV = () => {
         />
         </div>
        
-
+ 
 <Box sx={{ mt: 2, textAlign: "center" }}>
   <Button variant="contained" onClick={exportCustomersCSV}>
     Export Customers (CSV)
   </Button>
 </Box>
-
-
+ 
+ 
     </>
   );
 }
 export default CustomerList;
+ 

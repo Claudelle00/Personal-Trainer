@@ -6,8 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import EditTrainings from "../Trainings/EditTrainings";
 import { deleteTraining, fetchTrainings } from "../../trainingsapi";
-import type { CustomerData } from "../../types";
-import { fetchCustomer } from "../../customerapi";
+
 
 
 function CustomToolbar() {
@@ -20,15 +19,7 @@ function CustomToolbar() {
 
 function TrainingsList() {
     const [trainings, setTrainings]= useState<TrainingsData[]>([]);
-    const [customers, setCustomers] = useState<CustomerData[]>([]);
-    const getIdFromUrl = (url?: string) => {if (!url) return undefined; return url.split("/").filter(Boolean).pop();};
-
-    const customerMap = new Map(
-  customers.map(c => [getIdFromUrl(c._links.self.href), c])
-
-  
-
-);
+   
 
 const withBase = (url: string) =>
   url.startsWith("http")
@@ -56,7 +47,6 @@ const withBase = (url: string) =>
         {field: "activity", headerName:"Activity", width:150 },
         { field: "customerName", 
             headerName: "Customer",
-            valueFormatter: params => params.value?.firstname + ' ' + params.value?.lastname,
              width: 180 },
         {
          field: "delete",
@@ -92,7 +82,7 @@ const withBase = (url: string) =>
 
     const getTrainings = () => {
         fetchTrainings()
-        .then(data => setTrainings(data._embedded.trainings))
+        .then(data => setTrainings(data))
         .catch(err => console.error(err))
     }
 
@@ -127,25 +117,20 @@ const withBase = (url: string) =>
     }
 
     const rows = trainings.map(training =>{
-        const customer = customerMap.get(getIdFromUrl(training.customer));
+       
         
 
         return{
             ...training,
             id:training._links.self.href,
-            customerName: customer
-            ? `${customer.firstname} ${customer.lastname}`
+            customerName: training.customerData
+            ? `${training.customerData.firstname} ${training.customerData.lastname}`
             : "Unknown"
         };
     });
 
     useEffect(()=>{
         getTrainings();
-
-
-        fetchCustomer()
-            .then(data => setCustomers(data._embedded.customers))
-            .catch(err => console.error(err));
     }, []);
 
     return(

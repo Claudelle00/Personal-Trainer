@@ -13,7 +13,7 @@ type Training = {
   date: string;
   duration: number;
   activity: string;
-  customer: Customer | string; 
+  customer: Customer | string | null; 
 };
 
 type CalendarEvent = {
@@ -45,7 +45,7 @@ function TrainingCalendar() {
 
           return {
             title: `${t.activity} - ${
-              typeof t.customer === "object"
+              t.customer && typeof t.customer === "object"
                 ? `${t.customer.firstname} ${t.customer.lastname}`
                 : "Unknown"
             }`,
